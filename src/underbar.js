@@ -310,7 +310,25 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var holder = {};
+    return function() {
+      // creates key equal to arguments in string format
+      var key = JSON.stringify(arguments);
+      // if we haven't run those arguments, holder[key] won't exist
+      // run function and save result in object
+      if(holder[key] === undefined){
+        holder[key] = func.apply(this, arguments);
+        // return value
+        return holder[key];
+      } else {
+        // if already exists return it
+        return holder[key];
+      }
+    }
   };
+  // function add(a, b) {
+  //   return a + b;
+  // }
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
@@ -319,6 +337,14 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    //calling slice from Array prototype using call
+    //call params (value of THIS, pass in function)
+    //slices off arguments after wait parameter
+    var args = Array.prototype.slice.call(arguments, 2);
+    var funcTime = function () {
+      return func.apply(this, args);
+    };
+    setTimeout(funcTime, wait);
   };
 
 
@@ -331,8 +357,22 @@
   //
   // TIP: This function's test suite will ask that you not modify the original
   // input array. For a tip on how to make a copy of an array, see:
-  // http://mdn.io/Array.prototype.slice
+  // http://mdn.io/Array.prototype.slice //aimee
+
   _.shuffle = function(array) {
+    // took whatever was in first index
+    // put into holder
+    // then took whatever in the random index
+    // put into first index
+    var newArr = array.slice();
+    var holder = '';
+    var newIndex = Math.floor(Math.random(array.length - 1));
+    _.each(newArr, function(val, ind) {
+      holder = val;
+      newArr[ind] = newArr[newIndex];
+      newArr[newIndex] = holder;
+    });
+    return newArr;
   };
 
 
